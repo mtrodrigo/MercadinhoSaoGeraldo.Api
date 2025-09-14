@@ -1,16 +1,14 @@
-using System;
+// MercadinhoSaoGeraldo.Api/Domain/Product.cs
+namespace MercadinhoSaoGeraldo.Api.Domain;
 
-namespace MercadinhoSaoGeraldo.Api.Domain
+public class Product
 {
-    public class Product
-    {
-        public Guid Id { get; set; }
-        public string Nome { get; set; } = default!;
-        public string? Descricao { get; set; }
-        public decimal Preco { get; set; }
-        public int Estoque { get; set; }
-        public string? ImagemUrl { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Nome { get; set; } = "";
+    public string? Descricao { get; set; }
+    public decimal Preco { get; set; }
+    public int Estoque { get; set; }
+    public string? ImagemUrl { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 }

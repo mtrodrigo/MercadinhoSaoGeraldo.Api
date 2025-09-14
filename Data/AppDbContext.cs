@@ -6,13 +6,17 @@ namespace MercadinhoSaoGeraldo.Api.Data
     public class AppDbContext : DbContext
     {
         public DbSet<AppUser> Users => Set<AppUser>();
-
+        public DbSet<AppUserDetail> UserDetails => Set<AppUserDetail>();
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-
         protected override void OnModelCreating(ModelBuilder b)
         {
+            base.OnModelCreating(b);
+
             b.Entity<AppUser>(e =>
             {
                 e.ToTable("app_users");
@@ -23,12 +27,12 @@ namespace MercadinhoSaoGeraldo.Api.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
                 e.Property(x => x.CpfEnc).HasColumnName("cpf_enc");
-                e.HasOne(x => x.Detail)
-    .WithOne(d => d.User)
-    .HasForeignKey<AppUserDetail>(d => d.UserId)
-    .OnDelete(DeleteBehavior.Cascade);
-            });
 
+                e.HasOne(x => x.Detail)
+                 .WithOne(d => d.User)
+                 .HasForeignKey<AppUserDetail>(d => d.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
 
             b.Entity<AppUserDetail>(e =>
             {
@@ -37,7 +41,6 @@ namespace MercadinhoSaoGeraldo.Api.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
             });
-
 
             b.Entity<Product>(e =>
             {
@@ -49,7 +52,6 @@ namespace MercadinhoSaoGeraldo.Api.Data
                 e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
             });
 
-
             b.Entity<Order>(e =>
             {
                 e.ToTable("orders");
@@ -58,7 +60,6 @@ namespace MercadinhoSaoGeraldo.Api.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.HasMany(x => x.Itens).WithOne().HasForeignKey(i => i.OrderId);
             });
-
 
             b.Entity<OrderItem>(e =>
             {
