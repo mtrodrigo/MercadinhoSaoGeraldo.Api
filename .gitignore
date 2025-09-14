@@ -1,0 +1,60 @@
+# Build results
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.pdb
+*.mdb
+
+# Visual Studio / VSCode
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Cache
+*.vs/
+*.cache/
+*.config
+*.dbmdl
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Rider
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Environment files
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Supabase local configs
+.supabase/
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+TestResult.xml
+TestResults/
