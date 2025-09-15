@@ -13,7 +13,7 @@ namespace MercadinhoSaoGeraldo.Api.Security
         { _issuer = issuer; _audience = audience; _key = key; }
 
 
-        public string CreateAccessToken(Guid userId, string email, string role, int minutes = 15)
+        public string CreateAccessToken(Guid userId, string email, string role, int value = 1)
         {
             var claims = new[]
             {
@@ -30,7 +30,7 @@ namespace MercadinhoSaoGeraldo.Api.Security
 
 
             var token = new JwtSecurityToken(_issuer, _audience, claims,
-            expires: DateTime.UtcNow.AddMinutes(minutes),
+            expires: DateTime.UtcNow.AddDays(value),
             signingCredentials: creds);
 
 
