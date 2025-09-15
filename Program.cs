@@ -1,2 +1,20 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using DotNetEnv;
+using Serilog;
+using MercadinhoSaoGeraldo.Api.Infrastructure;
+
+Env.TraversePath().Load();
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
+
+ServiceRegistration.AddAppServices(builder.Services, builder.Configuration);
+
+var app = builder.Build();
+
+AppPipeline.Use(app, builder.Configuration);
+
+app.Run();
