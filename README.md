@@ -61,7 +61,28 @@ dotnet build
 dotnet run
 ```
 
-Por padrão sobe em **http://localhost:5000**.  
+Por padrão sobe em **http://localhost:5000**.
+
+---
+
+## ☁️ Deploy no Render
+
+1. Crie (ou reutilize) um serviço **Web Service** no [Render](https://render.com) apontando para este repositório.
+2. Se preferir a automação, utilize o arquivo [`render.yaml`](render.yaml) deste projeto para criar o serviço via **Blueprint** (`render blueprint deploy`). Ele já informa:
+   - uso do `Dockerfile` e do `entrypoint.sh` existentes;
+   - verificação de saúde em `GET /ping`;
+   - variáveis de ambiente esperadas (configure-as como **Secrets** antes do deploy).
+3. Configure os secrets listados abaixo com os mesmos valores utilizados no `.env` local:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_DB_CONNECTION`
+   - `JWT_ISSUER`
+   - `JWT_AUDIENCE`
+   - `JWT_KEY`
+   - `AES_KEY_BASE64`
+   - (`opcional`) `USE_HTTPS_REDIRECT`
+4. No Render, a variável `PORT` é fornecida automaticamente; o container já publica a API em `0.0.0.0:$PORT` através do `entrypoint.sh`.
+5. Após o deploy, utilize o endpoint `/ping` para confirmar que a aplicação está saudável (o Render também usará essa rota no health check).
 
 ---
 

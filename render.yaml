@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: mercadinho-sao-geraldo-api
+    env: docker
+    plan: starter
+    region: oregon
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /ping
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DOTNET_EnableDiagnostics
+        value: "0"
+      - key: SUPABASE_URL
+        fromSecret: mercadinho-supabase-url
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        fromSecret: mercadinho-supabase-service-role-key
+      - key: SUPABASE_DB_CONNECTION
+        fromSecret: mercadinho-supabase-db-connection
+      - key: JWT_ISSUER
+        fromSecret: mercadinho-jwt-issuer
+      - key: JWT_AUDIENCE
+        fromSecret: mercadinho-jwt-audience
+      - key: JWT_KEY
+        fromSecret: mercadinho-jwt-key
+      - key: AES_KEY_BASE64
+        fromSecret: mercadinho-aes-key-base64
+      - key: USE_HTTPS_REDIRECT
+        value: "false"

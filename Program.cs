@@ -1,4 +1,5 @@
-﻿using DotNetEnv;
+using DotNetEnv;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 using MercadinhoSaoGeraldo.Api.Infrastructure;
 
@@ -16,5 +17,11 @@ ServiceRegistration.AddAppServices(builder.Services, builder.Configuration);
 var app = builder.Build();
 
 AppPipeline.Use(app, builder.Configuration);
+
+app.MapGet("/ping", () =>
+        Results.Json(new { status = "ok", service = "Mercadinho API" }))
+    .WithName("Ping")
+    .WithTags("Health")
+    .WithOpenApi();
 
 app.Run();
