@@ -60,7 +60,7 @@ public static class ServiceRegistration
         services.AddCors(opt =>
         {
             opt.AddPolicy("Default", p => p
-                .WithOrigins("http://localhost:5173", "http://localhost:5174", "https://seu-front.com.br")
+                .WithOrigins("http://localhost:8081", "https://seu-front.com.br")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials());
