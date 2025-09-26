@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OpenApi;
 using Serilog;
 using MercadinhoSaoGeraldo.Api.Infrastructure;
 
