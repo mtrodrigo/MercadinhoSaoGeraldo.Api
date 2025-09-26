@@ -47,6 +47,9 @@ JWT_ISSUER=mercadinho-api
 JWT_AUDIENCE=mercadinho-clients
 JWT_KEY=uma-chave-aleatoria-bem-grande-para-jwt
 
+# A chave JWT deve ter pelo menos 128 bits (16 bytes) em UTF-8.
+# Recomenda-se utilizar 32 bytes para compatibilidade com AES-256.
+
 # Criptografia AES-256 (Base64 de 32 bytes)
 AES_KEY_BASE64=GERADO_EM_BASE64_DE_32_BYTES
 ```

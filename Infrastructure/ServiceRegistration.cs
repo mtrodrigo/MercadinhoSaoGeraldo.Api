@@ -35,6 +35,11 @@ public static class ServiceRegistration
         var issuer = AppConfig.Require(cfg, "JWT_ISSUER");
         var audience = AppConfig.Require(cfg, "JWT_AUDIENCE");
         var jwtKey = AppConfig.Require(cfg, "JWT_KEY");
+        var jwtKeyByteCount = Encoding.UTF8.GetByteCount(jwtKey);
+        if (jwtKeyByteCount < 16)
+        {
+            throw new InvalidOperationException("JWT_KEY must be at least 128 bits (16 bytes) when encoded as UTF-8. Consider using a 32-byte key similar to AES-256.");
+        }
         services.AddSingleton(new JwtService(issuer, audience, jwtKey));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
