@@ -71,7 +71,7 @@ public static class ServiceRegistration
 
         if (allowedOrigins is null || allowedOrigins.Length == 0)
         {
-            allowedOrigins = new[] { "http://localhost:8081" };
+            allowedOrigins = new[] { "*" };
         }
 
         services.AddCors(opt =>
