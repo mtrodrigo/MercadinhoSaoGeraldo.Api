@@ -25,12 +25,12 @@ namespace Mercadinho.Api.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public IActionResult Register([FromBody] RegisterDto dto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
             var email = dto.Email?.Trim().ToLowerInvariant();
-            var exists = _db.Users.AsNoTracking().Any(u => u.Email == email);
+            var exists = await _db.Users.AsNoTracking().AnyAsync(u => u.Email == email);
             if (exists) return new JsonResult(new { message = "Email já cadastrado." }) { StatusCode = StatusCodes.Status409Conflict };
 
             var hash = PasswordHasher.Hash(dto.Password);
@@ -50,7 +50,7 @@ namespace Mercadinho.Api.Controllers
             };
 
             _db.Users.Add(user);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return new JsonResult(new { message = "Registrado com sucesso.", id = user.Id, email = user.Email, nome = user.Nome, role = user.Role }) { StatusCode = StatusCodes.Status200OK };
         }
