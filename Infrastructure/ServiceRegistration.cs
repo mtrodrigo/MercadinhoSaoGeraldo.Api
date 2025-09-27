@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using MercadinhoSaoGeraldo.Api.Data;
@@ -62,10 +63,21 @@ public static class ServiceRegistration
             opt.AddPolicy("Cliente", p => p.RequireRole("Cliente", "Admin"));
         });
 
+        var allowedOriginsRaw = cfg["ALLOWED_ORIGINS"] ?? Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        var allowedOrigins = allowedOriginsRaw?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(o => !string.IsNullOrWhiteSpace(o))
+            .ToArray();
+
+        if (allowedOrigins is null || allowedOrigins.Length == 0)
+        {
+            allowedOrigins = new[] { "http://localhost:8081" };
+        }
+
         services.AddCors(opt =>
         {
             opt.AddPolicy("Default", p => p
-                .WithOrigins("http://localhost:8081", "https://seu-front.com.br")
+                .WithOrigins(allowedOrigins)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials());

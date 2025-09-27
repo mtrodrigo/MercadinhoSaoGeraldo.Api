@@ -42,6 +42,9 @@ SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
 SUPABASE_DB_CONNECTION=Host=aws-1-sa-east-1.pooler.supabase.com;Port=6543;Database=postgres;Username=postgres.SEU-PROJETO;Password=SUA-SENHA;SSL Mode=Require
 
+# CORS (lista separada por vírgula)
+ALLOWED_ORIGINS=http://localhost:8081,https://seu-front.com.br,https://seu-projeto.supabase.co
+
 # JWT
 JWT_ISSUER=mercadinho-api
 JWT_AUDIENCE=mercadinho-clients
@@ -53,6 +56,8 @@ JWT_KEY=uma-chave-aleatoria-bem-grande-para-jwt
 # Criptografia AES-256 (Base64 de 32 bytes)
 AES_KEY_BASE64=GERADO_EM_BASE64_DE_32_BYTES
 ```
+
+Se `ALLOWED_ORIGINS` não for informado, a API libera apenas `http://localhost:8081` por padrão. Informe todos os domínios do seu frontend (como o deploy no Supabase ou outra CDN) separando-os por vírgula para que o CORS aceite as requisições.
 
 ---
 
