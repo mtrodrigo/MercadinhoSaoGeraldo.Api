@@ -99,14 +99,99 @@ public static class Database
         directConnection = string.Empty;
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         if (string.IsNullOrWhiteSpace(builder.Host)) return false;
-        if (!builder.Host.Contains(".pooler.supabase.com", StringComparison.OrdinalIgnoreCase)) return false;
+        if (!builder.Host.EndsWith(".pooler.supabase.com", StringComparison.OrdinalIgnoreCase)) return false;
 
-        var directHost = builder.Host.Replace(".pooler.", ".", StringComparison.OrdinalIgnoreCase);
-        if (directHost.Equals(builder.Host, StringComparison.Ordinal)) return false;
+        if (!TryResolveDirectSupabaseEndpoint(builder.Host, out var directHost, out var directPort)) return false;
+
+        if (string.Equals(builder.Host, directHost, StringComparison.OrdinalIgnoreCase)) return false;
 
         builder.Host = directHost;
-        if (builder.Port == 6543) builder.Port = 5432;
+        if (directPort.HasValue && directPort.Value > 0)
+        {
+            builder.Port = directPort.Value;
+        }
+        else if (builder.Port == 6543)
+        {
+            builder.Port = 5432;
+        }
+
         directConnection = builder.ConnectionString;
         return true;
     }
+
+    static bool TryResolveDirectSupabaseEndpoint(string poolingHost, out string host, out int? port)
+    {
+        host = string.Empty;
+        port = null;
+
+        var directOverride = Environment.GetEnvironmentVariable("SUPABASE_DIRECT_DB_CONNECTION");
+        if (!string.IsNullOrWhiteSpace(directOverride))
+        {
+            if (TryExtractHostAndPort(directOverride, out host, out port) && !IsPoolingHost(host))
+            {
+                return true;
+            }
+        }
+
+        var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL");
+        if (!string.IsNullOrWhiteSpace(supabaseUrl) && Uri.TryCreate(supabaseUrl, UriKind.Absolute, out var supabaseUri))
+        {
+            if (!string.IsNullOrWhiteSpace(supabaseUri.Host) && !IsPoolingHost(supabaseUri.Host))
+            {
+                host = supabaseUri.Host;
+                return true;
+            }
+        }
+
+        const string poolingSuffix = ".pooler.supabase.com";
+        if (poolingHost.EndsWith(poolingSuffix, StringComparison.OrdinalIgnoreCase))
+        {
+            var projectRef = poolingHost[..^poolingSuffix.Length];
+            if (!string.IsNullOrWhiteSpace(projectRef))
+            {
+                host = $"{projectRef}.supabase.co";
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static bool TryExtractHostAndPort(string value, out string host, out int? port)
+    {
+        host = string.Empty;
+        port = null;
+        if (string.IsNullOrWhiteSpace(value)) return false;
+
+        if (value.Contains('='))
+        {
+            try
+            {
+                var builder = new NpgsqlConnectionStringBuilder(value);
+                if (!string.IsNullOrWhiteSpace(builder.Host))
+                {
+                    host = builder.Host;
+                    if (builder.Port > 0) port = builder.Port;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("Failed to parse SUPABASE_DIRECT_DB_CONNECTION as connection string: {Message}", ex.Message);
+            }
+        }
+
+        if (Uri.TryCreate(value, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.Host))
+        {
+            host = uri.Host;
+            if (!uri.IsDefaultPort) port = uri.Port;
+            return true;
+        }
+
+        host = value.Trim();
+        return !string.IsNullOrWhiteSpace(host);
+    }
+
+    static bool IsPoolingHost(string host)
+        => host.EndsWith(".pooler.supabase.com", StringComparison.OrdinalIgnoreCase);
 }
