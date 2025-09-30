@@ -71,6 +71,7 @@ public static class Database
         if (dsb.ConnectionStringBuilder.Timeout <= 0) dsb.ConnectionStringBuilder.Timeout = 15;
         if (dsb.ConnectionStringBuilder.CommandTimeout <= 0) dsb.ConnectionStringBuilder.CommandTimeout = 120;
         if (dsb.ConnectionStringBuilder.MaxPoolSize <= 0) dsb.ConnectionStringBuilder.MaxPoolSize = 20;
+        dsb.ConnectionStringBuilder.IPAddressPreference = IPAddressPreference.IPv4;
         return dsb.Build();
     }
 
