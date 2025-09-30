@@ -129,6 +129,7 @@ public static class Database
         {
             if (TryExtractHostAndPort(directOverride, out host, out port) && !IsPoolingHost(host))
             {
+                Log.Information("Resolved Supabase direct host from {Source}: {Host}", "SUPABASE_DIRECT_DB_CONNECTION", host);
                 return true;
             }
         }
@@ -136,25 +137,79 @@ public static class Database
         var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL");
         if (!string.IsNullOrWhiteSpace(supabaseUrl) && Uri.TryCreate(supabaseUrl, UriKind.Absolute, out var supabaseUri))
         {
+            if (TryBuildDirectHostFromSupabaseHost(supabaseUri.Host, out var supabaseHost))
+            {
+                host = supabaseHost;
+                Log.Information("Resolved Supabase direct host from {Source}: {Host}", "SUPABASE_URL", host);
+                return true;
+            }
             if (!string.IsNullOrWhiteSpace(supabaseUri.Host) && !IsPoolingHost(supabaseUri.Host))
             {
                 host = supabaseUri.Host;
+                Log.Information("Resolved Supabase host from {Source} without rewrite: {Host}", "SUPABASE_URL", host);
                 return true;
             }
         }
 
         const string poolingSuffix = ".pooler.supabase.com";
-        if (poolingHost.EndsWith(poolingSuffix, StringComparison.OrdinalIgnoreCase))
+        if (TryBuildDirectHostFromPoolingHost(poolingHost, poolingSuffix, out var poolingDirectHost))
         {
-            var projectRef = poolingHost[..^poolingSuffix.Length];
-            if (!string.IsNullOrWhiteSpace(projectRef))
-            {
-                host = $"{projectRef}.supabase.co";
-                return true;
-            }
+            host = poolingDirectHost;
+            Log.Information("Resolved Supabase direct host from {Source}: {Host}", "Pooler", host);
+            return true;
         }
 
         return false;
+    }
+
+    static bool TryBuildDirectHostFromSupabaseHost(string? host, out string directHost)
+    {
+        directHost = string.Empty;
+        if (string.IsNullOrWhiteSpace(host)) return false;
+
+        var trimmedHost = host.Trim().TrimEnd('.');
+        if (trimmedHost.StartsWith("db.", StringComparison.OrdinalIgnoreCase))
+        {
+            directHost = trimmedHost;
+            return true;
+        }
+
+        const string supabaseSuffix = ".supabase.co";
+        if (!trimmedHost.EndsWith(supabaseSuffix, StringComparison.OrdinalIgnoreCase)) return false;
+
+        var prefix = trimmedHost[..^supabaseSuffix.Length];
+        var projectRef = ExtractProjectRef(prefix);
+        if (string.IsNullOrWhiteSpace(projectRef)) return false;
+
+        directHost = $"db.{projectRef}.supabase.co";
+        return true;
+    }
+
+    static bool TryBuildDirectHostFromPoolingHost(string poolingHost, string poolingSuffix, out string directHost)
+    {
+        directHost = string.Empty;
+        if (!poolingHost.EndsWith(poolingSuffix, StringComparison.OrdinalIgnoreCase)) return false;
+
+        var prefix = poolingHost[..^poolingSuffix.Length];
+        var projectRef = ExtractProjectRef(prefix);
+        if (string.IsNullOrWhiteSpace(projectRef)) return false;
+
+        directHost = $"db.{projectRef}.supabase.co";
+        return true;
+    }
+
+    static string ExtractProjectRef(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+
+        var trimmed = value.Trim();
+        if (trimmed.StartsWith("db.", StringComparison.OrdinalIgnoreCase))
+        {
+            trimmed = trimmed[3..];
+        }
+
+        var parts = trimmed.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length > 0 ? parts[0] : string.Empty;
     }
 
     static bool TryExtractHostAndPort(string value, out string host, out int? port)
