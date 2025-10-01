@@ -76,11 +76,24 @@ public static class ServiceRegistration
 
         services.AddCors(opt =>
         {
-            opt.AddPolicy("Default", p => p
-                .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials());
+            opt.AddPolicy("Default", policy =>
+            {
+                if (allowedOrigins.Length == 1 && allowedOrigins[0] == "*")
+                {
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
+                else
+                {
+                    policy
+                        .WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                }
+            });
         });
 
         services.AddControllers().AddJsonOptions(o =>
@@ -97,3 +110,4 @@ public static class ServiceRegistration
         if (aesKey.Length != 32) throw new InvalidOperationException("AES_KEY_BASE64 must be 32 bytes (Base64).");
     }
 }
+

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MercadinhoSaoGeraldo.Api.Data;
 using MercadinhoSaoGeraldo.Api.Dtos;
 using MercadinhoSaoGeraldo.Api.Security;
+using MercadinhoSaoGeraldo.Api.Infrastructure;
 using System;
 using System.Security.Claims;
 
@@ -17,7 +18,7 @@ namespace MercadinhoSaoGeraldo.Api.Controllers
         private readonly AppDbContext _db;
         private readonly byte[] _aesKey;
         public ProfileController(AppDbContext db, IConfiguration cfg)
-        { _db = db; _aesKey = Convert.FromBase64String(cfg["AES_KEY_BASE64"]!); }
+        { _db = db; _aesKey = Convert.FromBase64String(AppConfig.Require(cfg, "AES_KEY_BASE64")); }
 
 
         private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

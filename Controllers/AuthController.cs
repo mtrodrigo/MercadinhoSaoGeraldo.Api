@@ -5,6 +5,7 @@ using MercadinhoSaoGeraldo.Api.Data;
 using MercadinhoSaoGeraldo.Api.Domain;
 using MercadinhoSaoGeraldo.Api.Dtos;
 using MercadinhoSaoGeraldo.Api.Security;
+using MercadinhoSaoGeraldo.Api.Infrastructure;
 
 namespace Mercadinho.Api.Controllers
 {
@@ -20,7 +21,7 @@ namespace Mercadinho.Api.Controllers
         {
             _db = db;
             _jwt = jwt;
-            _aesKey = Convert.FromBase64String(cfg["AES_KEY_BASE64"]!);
+            _aesKey = Convert.FromBase64String(AppConfig.Require(cfg, "AES_KEY_BASE64"));
         }
 
         [HttpPost("register")]
@@ -73,3 +74,5 @@ namespace Mercadinho.Api.Controllers
         }
     }
 }
+
+
