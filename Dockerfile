@@ -29,7 +29,10 @@ COPY --from=build /app/out ./
 
 # Script de entrada (usa $PORT do Render)
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# remove possible BOM and Windows CRLF
+RUN sed -i '1s/^\xEF\xBB\xBF//' /entrypoint.sh \
+ && sed -i 's/\r$//' /entrypoint.sh \
+ && chmod +x /entrypoint.sh
 
 # Healthcheck bate no /ping
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
