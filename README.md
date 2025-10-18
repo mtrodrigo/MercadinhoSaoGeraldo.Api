@@ -44,7 +44,7 @@ USE_HTTPS_REDIRECT=false
 
 ## Execução local
 
-1. Instale o [.NET SDK 8.0](https://dotnet.microsoft.com/en-us/download).
+1. Instale o .NET SDK 8.0.
 2. Garanta que um servidor PostgreSQL esteja disponível e que a cadeia de conexão apontada nas variáveis esteja acessível.
 3. Clone o repositório e restaure as dependências:
 
@@ -60,13 +60,12 @@ USE_HTTPS_REDIRECT=false
    ```
 
 5. A API ficará disponível em `http://localhost:5000` (ou na porta definida em `ASPNETCORE_URLS`).
-6. Em ambiente de desenvolvimento a documentação Swagger ficará disponível em `/swagger`.
 
 > Obs.: aplique as migrações/DDL necessárias no banco antes de iniciar a API.
 
 ## Execução com Docker
 
-1. Crie um arquivo `.env` com as variáveis de ambiente (como mostrado acima).
+1. Crie um arquivo `.env` com as variáveis de ambiente.
 2. Construa a imagem:
 
    ```bash
