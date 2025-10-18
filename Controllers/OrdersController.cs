@@ -24,7 +24,6 @@ namespace Mercadinho.Api.Controllers
         private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
 
-        // Cliente cria pedido com itens [{productId, quantidade}]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
         {
@@ -37,7 +36,6 @@ namespace Mercadinho.Api.Controllers
             if (products.Count != ids.Count) return BadRequest("Produto inexistente.");
 
 
-            // Verificar estoque
             foreach (var it in dto.Itens)
             {
                 var p = products.First(x => x.Id == it.ProductId);
@@ -63,7 +61,7 @@ namespace Mercadinho.Api.Controllers
             foreach (var it in dto.Itens)
             {
                 var p = products.First(x => x.Id == it.ProductId);
-                p.Estoque -= it.Quantidade; // baixa de estoque
+                p.Estoque -= it.Quantidade;
                 var oi = new OrderItem
                 {
                     Id = Guid.NewGuid(),
@@ -86,7 +84,6 @@ namespace Mercadinho.Api.Controllers
         }
 
 
-        // Cliente: lista meus pedidos (+ itens)
         [HttpGet("mine")]
         public async Task<IActionResult> GetMine()
         {
@@ -109,7 +106,6 @@ namespace Mercadinho.Api.Controllers
         }
 
 
-        // Admin: lista todos os pedidos
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
